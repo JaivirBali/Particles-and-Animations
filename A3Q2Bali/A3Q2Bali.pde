@@ -1,7 +1,8 @@
 // Jaivir Bali (7775370)
 // A3Q2
 float eyeX = 1, eyeY = 2, eyeZ = 0, centerX = 0, centerY = 1, centerZ = -2, upX = 0, upY = 1, upZ = 0;
-boolean o = true;
+boolean perspective = true;  //toggle between perspective 1 and 2
+int positionCount = 0;
 
 
 void setup() {
@@ -12,7 +13,7 @@ void setup() {
 void draw() {
   clear();
   resetMatrix();
-  if(o){
+  if(perspective){
     ortho(-1, 1, 1, -1, 1, 6);
   }else{
     frustum(-1, 1, 1, -1, 1, 6);
@@ -62,44 +63,75 @@ void draw() {
 
 void keyPressed() {
   switch(key) {
-    case 'o':
-      o = true;
+    case 'o':      //default perspective
+      perspective = true;
       break;
     case 'p':
-      o = false;
+      perspective = false;
       break;
-    case 'j':    //adjust views 
-      eyeX = -2;
-      eyeY = 2;
-      eyeZ = 0;
-      centerX = -1;
-      centerY = 1;
-      centerZ = -2;
-      upX = 0; 
-      upY = 1;
-      upZ = 0;
+    case ' ':
+      positionCount++;
+      positionCount = positionCount % 6;  //want to keep in range between 0-5
+      
+      if (positionCount < 3) {    //determine perspective
+        perspective = true;
+      } else {
+        perspective = false;
+      };
+      
+      if (positionCount % 3 == 0) {        //determine view
+        setView0();
+      } else if (positionCount % 3 == 1) {
+        setView1();
+      } else if (positionCount % 3 == 2) {
+        setView2();
+      }
+      
       break;
-    case 'k':    //default
-      eyeX = 1;
-      eyeY = 2;
-      eyeZ = 0;
-      centerX = 0;
-      centerY = 1;
-      centerZ = -2;
-      upX = 0; 
-      upY = 1;
-      upZ = 0;
+    case 'j':    //default view
+      setView0();
+      break;
+    case 'k':    
+      setView1();
       break;
     case 'l':
-      eyeX = 1;
-      eyeY = 2;
-      eyeZ = 0;
-      centerX = 0;
-      centerY = 1;
-      centerZ = -2;
-      upX = 0; 
-      upY = 1;
-      upZ = 1;
+      setView2();
       break;
   } //end switch statement
 } //end keypressed function
+
+void setView0() {
+  eyeX = 1;
+  eyeY = 2;
+  eyeZ = 0;
+  centerX = 0;
+  centerY = 1;
+  centerZ = -2;
+  upX = 0; 
+  upY = 1;
+  upZ = 0;
+}
+
+void setView1() {
+  eyeX = -2;
+  eyeY = 2;
+  eyeZ = 0;
+  centerX = -1;
+  centerY = 1;
+  centerZ = -2;
+  upX = 0; 
+  upY = 1;
+  upZ = 0;
+}
+
+void setView2() {
+  eyeX = 1;
+  eyeY = 2;
+  eyeZ = 0;
+  centerX = 0;
+  centerY = 1;
+  centerZ = -2;
+  upX = 0; 
+  upY = 1;
+  upZ = 1;
+}
