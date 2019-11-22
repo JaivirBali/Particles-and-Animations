@@ -12,9 +12,9 @@ boolean currLerping = false;  //don't want to cancel animation while lerping
 float[][] keys = {
   { -2,0.25,-2, 0, 0, -PI/2, 0, 0 },    //***special middle of table (half height of base move up)
   { -1,0.25,1, PI/4, PI/3, (-2*PI)/3, PI/4, PI/4 },     //***special bottom right edge of table
-  { -3,0.25,1, 0, 0, -PI/2, 0, 0 },     //***special bottom left edge of table
-  { -1,0.25,-5, 0, 0, -PI/2, 0, 0 },    //***special top right edge of table
-  { -3,0.25,-5, 0, 0, -PI/2, 0, 0 },    //***special top left edge of table
+  { -3,0.25,1, PI/2, 0, 0, PI, PI },     //***special bottom left edge of table
+  { -1,0.25,-5, (3*PI)/4, -PI/4, 0, PI/2, PI/3 },    //***special top right edge of table
+  { -3,0.25,-5, PI, 0, -PI/4, 0, PI/4 },    //***special top left edge of table
 };
 
 
@@ -36,27 +36,27 @@ void draw() {
   
   translate(0, 0, -2.5); //move everything back so its viewable
   
-  //Axis for testing purposes
-  strokeWeight(1.0);
-  beginShape(LINES);
-  stroke(255,0,0);  //x
-  vertex(-2,0,0);
-  vertex(2,0,0);
-  stroke(0,255,0);  //y
-  vertex(0,-2,0);
-  vertex(0,2,0);
-  stroke(0,0,255);  //z
-  vertex(0,0,-2);
-  vertex(0,0,2);
-  endShape();
+  //Axis for testing purposes (commented out)
+  //strokeWeight(1.0);
+  //beginShape(LINES);
+  //stroke(255,0,0);  //x
+  //vertex(-2,0,0);
+  //vertex(2,0,0);
+  //stroke(0,255,0);  //y
+  //vertex(0,-2,0);
+  //vertex(0,2,0);
+  //stroke(0,0,255);  //z
+  //vertex(0,0,-2);
+  //vertex(0,0,2);
+  //endShape();
 
   
   stroke(255);
   scale(0.2,0.2,0.2); //set the scene size
    
-   //Origin for testing purposes
-  fill(255);  //origin
-  sphere(0.1);
+   //Origin for testing purposes (commented out)
+  //fill(255);  //origin
+  //sphere(0.1);
   
   
   //Drawing stuff now
