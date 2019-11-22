@@ -4,6 +4,10 @@ float eyeX = 1, eyeY = 2, eyeZ = 0, centerX = 0, centerY = 1, centerZ = -2, upX 
 boolean perspective = true;  //toggle between perspective 1 and 2
 int positionCount = 0;
 int currKey = 0;
+int nextKey = 0;
+float t = 0;
+float x, y, z, angle;
+boolean currLerping = false;  //don't want to cancel animation while lerping
 
 float[][] keys = {
   { -2,0.25,-2, 0, 0, -PI/2, 0, 0 },    //***special middle of table (half height of base move up)
@@ -68,7 +72,7 @@ void draw() {
   float tableLength = 8.0;
   
   translate(keys[0][0], keys[0][1] - tableHeight, keys[0][2]);  //static middle location
-
+  
   box(tableWidth, tableHeight, tableLength);  //table
   
   popMatrix();  //end table
@@ -77,10 +81,13 @@ void draw() {
   pushMatrix();  //start base
   fill(0,0,200);
   
-  translate(keys[currKey][0], keys[currKey][1], keys[currKey][2]);
+  x = lerp(keys[currKey][0], keys[nextKey][0], t);
+  y = lerp(keys[currKey][1], keys[nextKey][1], t);
+  z = lerp(keys[currKey][2], keys[nextKey][2], t);
+  translate(x, y, z);
   
-  float baseAngle = keys[currKey][3];
-  rotateY(baseAngle);  //do Y axis rotation for base (***special default of 0) --> -PI (CW) to +PI (CCW)
+  angle = lerp(keys[currKey][3], keys[nextKey][3], t);
+  rotateY(angle);  //do Y axis rotation for base (***special default of 0) --> -PI (CW) to +PI (CCW)
 
   float baseWidth = 2.0;
   float baseHeight = 0.5;
@@ -91,8 +98,8 @@ void draw() {
   pushMatrix();  //start lower arm
   fill(50,160,160);
   
-  float lowerArmAngle = keys[currKey][4];
-  rotateZ(lowerArmAngle);  //do Z axis rotation for lower arm (*** special default of 0) --> PI/3 (back) to -PI/3 (front)
+  angle = lerp(keys[currKey][4], keys[nextKey][4], t);
+  rotateZ(angle);  //do Z axis rotation for lower arm (*** special default of 0) --> PI/3 (back) to -PI/3 (front)
   
   float lowerArmWidth = 0.5;
   float lowerArmHeight = 2.5;
@@ -106,8 +113,9 @@ void draw() {
   fill(15,120,75);
   
   translate(0, (0.5*lowerArmHeight), 0);  //just offset half height of lower arm (want cube to be centered at middle of joint)
-  float upperArmAngle = keys[currKey][5];
-  rotateZ(upperArmAngle); //do Z axis rotation for arm joint (***special start with default of -PI/2 to face right)
+  
+  angle = lerp(keys[currKey][5], keys[nextKey][5], t);
+  rotateZ(angle); //do Z axis rotation for arm joint (***special start with default of -PI/2 to face right)
                           //--> 0 (vertical) to -PI/2 (perpendicular)
   float armJointLength = 0.75;
   box(armJointLength, armJointLength, armJointLength);  //arm joint
@@ -129,8 +137,9 @@ void draw() {
   fill(220,220,0);
     
   translate(0, (0.5*upperArmLength), 0);   //just offset half height of upper arm (want cube to be centered at middle of joint)
-  float headJointAngle = keys[currKey][6];
-  rotateY(headJointAngle);  //do Y axis rotation for the head joint (***special default of 0 to face down)
+  
+  angle = lerp(keys[currKey][6], keys[nextKey][6], t);
+  rotateY(angle);  //do Y axis rotation for the head joint (***special default of 0 to face down)
                             //--> -PI (CW) to +PI (CCW)
   float headJointLength = 0.50;
   box(headJointLength, headJointLength, headJointLength);  //head joint
@@ -142,8 +151,9 @@ void draw() {
   
   float headLength = 0.625;
   translate((0.5*headJointLength)+(0.5*headLength), 0, 0);
-  float headAngle = keys[currKey][7];
-  rotateX(headAngle);  //do X axis rotation for the head itself (***special default of 0) --> -PI/4 to +PI/4 (doesn't matter)
+  
+  angle = lerp(keys[currKey][7], keys[nextKey][7], t);
+  rotateX(angle);  //do X axis rotation for the head itself (***special default of 0) --> -PI/4 to +PI/4 (doesn't matter)
   box(headLength, headLength, headLength);  //head joint
   
   popMatrix();  //end head
@@ -155,9 +165,19 @@ void draw() {
   popMatrix();  //end scene stuff
   
   
+  //Update T value
+  float distance = dist(keys[currKey][0], keys[currKey][2], keys[nextKey][0], keys[nextKey][2]);
   
-  
-  
+  if (distance > 0.0) {
+    currLerping = true;
+    t = t + 0.04 / distance;
+    
+    if (t > 1) {
+      t = 0;
+      currKey = nextKey;
+      currLerping = false;
+    }
+  }
   
 } //<>//
 
@@ -198,20 +218,30 @@ void keyPressed() {
     case 'l':
       setView2();
       break;
-    case '1':
-      currKey = 0;
+    case '1':         //only want to switch key frames if not currently animating
+      if (currLerping == false) {
+        nextKey = 0;
+      }
       break;
     case '2':
-      currKey = 1;
+      if (currLerping == false) {
+        nextKey = 1;
+      }
       break;
     case '3':
-      currKey = 2;
+      if (currLerping == false) {
+        nextKey = 2;
+      }
       break;
     case '4':
-      currKey = 3;
+      if (currLerping == false) {
+        nextKey = 3;
+      }
       break;
     case '5':
-      currKey = 4;
+      if (currLerping == false) {
+        nextKey = 4;
+      }
       break;
   } //end switch statement
 } //end keypressed function
