@@ -34,16 +34,33 @@ void draw() {
   if (t0) {
     t0time = millis();
   }
+  float testPosX = 1;
+  float testPosY = 1;
+  
   
   pushMatrix();  //firework 1
   fill(0,0,200);
   tmod = 1 - cos(t * PI/2);
-  x = lerp(keys[0][0], 0, tmod);
-  y = lerp(keys[0][1], 1, tmod);
+  x = lerp(keys[0][0], testPosX, tmod);
+  y = lerp(keys[0][1], testPosY, tmod);
+  
+  float slope = (testPosY-keys[0][1])/(testPosX-keys[0][0]);
+  float angle1 = atan(slope);
+  
+  if (angle1 < 0){
+    angle1 += PI;  //want in quadrant 2, not quadrant 4
+  }
+  println(degrees(angle1));
+  println(slope);
+  
   translate(x, y);
+  rotate(angle1-PI/2);  //do in RADIANS
   scale(1.0-t);
   triangle(triX1, triY1, triX2, triY2, triX3, triY3);
   popMatrix();   //end firework 1
+  
+  
+  
   
   pushMatrix();  //firework 2
   fill(0,200,200);
@@ -70,7 +87,7 @@ void draw() {
   popMatrix();   //end firework 5
   
   
-  t = (millis() - t0time) / 2000.0 ;
+  t = (millis() - t0time) / 2000.0 ;  //only want proportional to time, don't care about distance travelled
   if (t > 1) {
     t0 = true;
     t = 0;
