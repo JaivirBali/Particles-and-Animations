@@ -8,19 +8,19 @@ int t0time;
 float x, y;
 
 float[][] keys = {
-  { 0, -1.0 },
-  { -0.9, -1.0 },
-  { -0.45,-1.0 },
-  { 0.45,-1.0 },
-  { 0.9,-1.0 }
+  { 0, -0.8 },
+  { -0.9, -0.8 },
+  { -0.45,-0.8 },
+  { 0.45,-0.8 },
+  { 0.9,-0.8 }
 };
 
 float triX1 = -0.1;
 float triX2 = 0.0;
 float triX3 = 0.1;
-float triY1 = -0.0;
-float triY2 = 0.2;
-float triY3 = -0.0;
+float triY1 = -0.2;
+float triY2 = 0.0;
+float triY3 = -0.2;
 
 void setup() {
   size(640, 640, P3D);
