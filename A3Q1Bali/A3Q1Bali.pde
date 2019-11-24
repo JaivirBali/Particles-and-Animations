@@ -8,19 +8,19 @@ int t0time;
 float x, y;
 
 float[][] keys = {
-  { 0, -0.9 },
-  { -0.9, -0.9 },
-  { -0.45,-0.9 },
-  { 0.45,-0.9 },
-  { 0.9,-0.9 }
+  { 0, -1.0 },
+  { -0.9, -1.0 },
+  { -0.45,-1.0 },
+  { 0.45,-1.0 },
+  { 0.9,-1.0 }
 };
 
 float triX1 = -0.1;
-float triX2 = 0;
+float triX2 = 0.0;
 float triX3 = 0.1;
-float triY1 = -0.1;
-float triY2 = 0.1;
-float triY3 = -0.1;
+float triY1 = -0.0;
+float triY2 = 0.2;
+float triY3 = -0.0;
 
 void setup() {
   size(640, 640, P3D);
@@ -34,7 +34,7 @@ void draw() {
   if (t0) {
     t0time = millis();
   }
-  float testPosX = 1;
+  float testPosX = 0;
   float testPosY = 1;
   
   
@@ -50,8 +50,8 @@ void draw() {
   if (angle1 < 0){
     angle1 += PI;  //want in quadrant 2, not quadrant 4
   }
-  println(degrees(angle1));
-  println(slope);
+  //println(degrees(angle1));
+  //println(slope);
   
   translate(x, y);
   rotate(angle1-PI/2);  //do in RADIANS
