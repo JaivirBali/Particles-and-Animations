@@ -3,6 +3,7 @@
 
 boolean t0 = true;
 float t = 0;
+float tmod;
 int t0time;
 float x, y;
 
@@ -30,11 +31,17 @@ void setup() {
 void draw() {
   background(0);
   
+  if (t0) {
+    t0time = millis();
+  }
+  
   pushMatrix();  //firework 1
   fill(0,0,200);
-  //x = lerp(keys[currKey][0], keys[nextKey][0], t);
-  //y = lerp(keys[currKey][1], keys[nextKey][1], t);
-  translate(keys[0][0], keys[0][1]);
+  tmod = 1 - cos(t * PI/2);
+  x = lerp(keys[0][0], 0, tmod);
+  y = lerp(keys[0][1], 1, tmod);
+  translate(x, y);
+  scale(1.0-t);
   triangle(triX1, triY1, triX2, triY2, triX3, triY3);
   popMatrix();   //end firework 1
   
@@ -63,5 +70,27 @@ void draw() {
   popMatrix();   //end firework 5
   
   
+  t = (millis() - t0time) / 2000.0 ;
+  if (t > 1) {
+    t0 = true;
+    t = 0;
+  } else {
+    t0 = false;
+  }
+  
+}
+
+class Rocket {
+  float xOffset, yOffset;
+  float r,g,b;
+  
+  Rocket (float xOffset, float yOffset, float r, float g, float b) {
+    this.xOffset = xOffset;
+    this.yOffset = yOffset;
+    
+    this.r = r;
+    this.b = b;
+    this.g = g;
+  }
   
 }
