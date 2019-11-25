@@ -1,11 +1,6 @@
 // Jaivir Bali (7775370)
 // A3Q1
 
-//boolean t0 = false;
-//float t = 0;
-//float tmod;
-//int t0time;
-
 float x, y;
 ArrayList<Rocket> rockets;
 
@@ -44,32 +39,15 @@ void setup() {
   
   newRocket = new Rocket (keys[4][0], keys[4][1],  200, 0, 0, 4);
   rockets.add(newRocket);
-  
-  //Rocket testRocket = rockets.get(0);
-  //testRocket.setMovement(-1, 1);
 }
 
 void draw() {
   background(0);
-  
-  //if (t0) {
-  //  t0time = millis();
-  //}
-  
+ 
   for (int i = 0; i < rockets.size(); i++){
     Rocket currRocket = rockets.get(i);
     currRocket.drawRocket();
   }
-  
-  
-  //t = (millis() - t0time) / 2000.0 ;  //only want proportional to time, don't care about distance travelled
-  //if (t > 1) {
-  //  t0 = true;
-  //  t = 0;
-  //} else {
-  //  t0 = false;
-  //}
-  
 }
 
 class Rocket {
@@ -105,12 +83,9 @@ class Rocket {
   }
   
   void drawRocket() {
-    //testPosX = 0;
-    //testPosY = 1;
-
     pushMatrix();  //firework 1
     fill(r, g, b);
-    //tmod = 1 - cos(t * PI/2);
+    
     tmod = sin(t * PI/2);  //ease-out for deceleration
     
     if (isMoving) {
@@ -135,7 +110,6 @@ class Rocket {
     } else {
       x = lerp(xOffset, testPosX, tmod);
       y = lerp(yOffset, testPosY, tmod);
-      //angle = PI/2;  //default angle
     }
     
     //println(degrees(angle));
@@ -234,7 +208,6 @@ void mouseReleased() {
     println("XR: " + mousePosX + ", YR = " + mousePosY);
     println("Drag Time: " + dragTime);
     
-    //TODO: CORRECT METHOD
     rockets.get(selectedRocket).setMovement(mousePosX, mousePosY, dragTime);
     
     rocketSelected = false;   //rocket will blow up, no longer want it selected
