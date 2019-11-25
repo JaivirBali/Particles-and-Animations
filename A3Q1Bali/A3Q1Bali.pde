@@ -74,8 +74,9 @@ void draw() {
 
 class Rocket {
   float xOffset, yOffset;
-  float r,g,b;
   float testPosX, testPosY;
+  
+  float r,g,b;
   int rocketNum;
   
   boolean isMoving;
@@ -109,7 +110,8 @@ class Rocket {
 
     pushMatrix();  //firework 1
     fill(r, g, b);
-    tmod = 1 - cos(t * PI/2);
+    //tmod = 1 - cos(t * PI/2);
+    tmod = sin(t * PI/2);  //ease-out for deceleration
     
     if (isMoving) {
       slope = (testPosY-yOffset)/(testPosX-xOffset);
@@ -121,12 +123,20 @@ class Rocket {
     } 
     
     if (currDragging && rocketNum == selectedRocket) {
-      xOffset = 2.0 * mouseX / width - 1;
-      yOffset = 2.0 * (height-mouseY+1) / height - 1;
+      x = 2.0 * mouseX / width - 1;
+      y = 2.0 * (height-mouseY+1) / height - 1;
+      
+      angle = atan((y-yOffset)/(x-xOffset));
+      if (angle < 0){
+        angle += PI;  //want in quadrant 2, not quadrant 4
+      }
+      
+      //println("ANGLE DRAG " + angle);
+    } else {
+      x = lerp(xOffset, testPosX, tmod);
+      y = lerp(yOffset, testPosY, tmod);
+      //angle = PI/2;  //default angle
     }
-    
-    x = lerp(xOffset, testPosX, tmod);
-    y = lerp(yOffset, testPosY, tmod);
     
     //println(degrees(angle));
     //println(slope);
@@ -142,24 +152,40 @@ class Rocket {
     popMatrix();   //end firework 1
     
     if (isMoving) {
-      if (t > 1) {
-        t = 0;
+      if (t >= 1) {
+        t = 1;
         isMoving = false;
-        angle = PI/2;
+        resetRocket();
       } else {
-        t = (millis() - t0time) / 2000.0 ;  //only want proportional to time, don't care about distance travelled
+        t = (millis() - t0time + 1000) / 2000.0 / 4 ;  //only want proportional to time, starting at 1/2 completed
       }
     }
     
   }
   
-  void setMovement(float testPosX, float testPosY) {
-    this.testPosX = testPosX;
-    this.testPosY = testPosY;
+  void resetRocket() {
+    angle = PI/2;
+    slope = 0;
+    t = 0;
+    testPosX = xOffset;
+    testPosY = yOffset;
+  }
+  
+  void setMovement(float newX, float newY, float dragTime) {
     isMoving = true;
-    slope = (testPosY-yOffset)/(testPosX-xOffset);
+    
+    float dx = newX-xOffset;
+    float dy = newY-yOffset;
+    slope = dy/dx;
     angle = atan(slope);
     t0time = millis();
+    
+    float velocityX = (dx/dragTime)*1000.0;
+    float velocityY = (dy/dragTime)*1000.0;
+    
+    println("X velocity: " + velocityX + ", Y velocity: " + velocityY); 
+    testPosX = newX + (1.0*velocityX);
+    testPosY = newY + (1.0*velocityY);
   }
 }
 
@@ -209,7 +235,7 @@ void mouseReleased() {
     println("Drag Time: " + dragTime);
     
     //TODO: CORRECT METHOD
-    //rockets.get(selectedRocket).setMovement(2*mousePosX, 2*mousePosY);
+    rockets.get(selectedRocket).setMovement(mousePosX, mousePosY, dragTime);
     
     rocketSelected = false;   //rocket will blow up, no longer want it selected
     selectedRocket = -1;    
