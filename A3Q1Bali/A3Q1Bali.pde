@@ -127,13 +127,30 @@ class Rocket {
     triangle(triX1, triY1, triX2, triY2, triX3, triY3);
     popMatrix();   //end firework 1
     
+    boolean isEarly = false;
+    //Automatically explode if out of bounds for X axis
+    if (x <= -1 || x >= 1) {
+      t = 1;
+      testPosX = x;
+      testPosY = y;
+      isEarly = true;
+    }
+    
+    //Automatically explode if out of bounds for Y axis at top only
+    if (y >= 1) {
+      t = 1;
+      testPosX = x;
+      testPosY = y;
+      isEarly = true;
+    }
+    
+    //decide when to stop and reset
     if (isMoving) {
       if (t >= 1) {
         t = 1;
         isMoving = false;
         
-        println("T >=1");
-        ps = new ParticleSystem(testPosX, testPosY);
+        ps = new ParticleSystem(testPosX, testPosY, isEarly);
      
         resetRocket();
       } else {
@@ -141,6 +158,7 @@ class Rocket {
       }
     }
     
+    //draw particle system
     if (ps != null) {
       if (ps.doneAnimating == false) {
         ps.addParticle();
@@ -240,17 +258,19 @@ class ParticleSystem {
   boolean doneAnimating = false;
   float particleTime = 2000.0;
   float totalTime = 4000.0;
+  boolean isEarly = false;
 
-  ParticleSystem(float originX, float originY) {
+  ParticleSystem(float originX, float originY, boolean isEarly) {
     this.originX = originX;
     this.originY = originY;
     sparks = new ArrayList<Spark>();
     startTime = millis();
+    this.isEarly = isEarly;
   }
 
   void addParticle() {
     if (millis() - startTime < particleTime) {
-      sparks.add(new Spark(originX, originY));
+      sparks.add(new Spark(originX, originY, isEarly));
     }
   }
 
@@ -276,14 +296,16 @@ class Spark {
   float velocityY;
   float gravity;
   float lifespan;
+  boolean onlyWhite;
 
-  Spark(float originX, float originY) {
+  Spark(float originX, float originY, boolean onlyWhite) {
     positionX = originX;
     positionY = originY;
     gravity = -0.0009;
     velocityX = random(-0.0075, 0.0075);
     velocityY = random(0, 0.02);
     lifespan = 255.0;
+    this.onlyWhite = onlyWhite;
   }
 
   void run() {
@@ -291,7 +313,7 @@ class Spark {
     display();
   }
 
-  // Method to update position
+  //update position
   void update() {
     velocityY += gravity;
     positionX += velocityX;
@@ -299,18 +321,23 @@ class Spark {
     lifespan -= 2.5;
   }
 
-  // Method to display
+  //draw spark
   void display() {
-    float r = random(0,256);
-    float g = random(0,256);
-    float b = random(0,256);
+    float r, g, b;
     
+    if (onlyWhite) {
+      r = g = b = 255;
+    } else {
+      r = random(0,256);
+      g = random(0,256);
+      b = random(0,256);
+    }
     stroke(0, lifespan);
     fill(r, g, b, lifespan);
     rect(positionX, positionY, 0.0125, 0.025);
   }
 
-  // Is the particle still useful?
+  //determine if spark should keep being drawn
   boolean isDead() {
     if (lifespan < 0.0) {
       return true;
