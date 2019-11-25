@@ -30,19 +30,19 @@ void setup() {
   resetMatrix();
   
   rockets = new ArrayList<Rocket>();
-  Rocket newRocket = new Rocket (keys[0][0], keys[0][1],  0, 0, 200);
+  Rocket newRocket = new Rocket (keys[0][0], keys[0][1],  0, 0, 200, 0);
   rockets.add(newRocket);
   
-  newRocket = new Rocket (keys[1][0], keys[1][1],  0, 200, 200);
+  newRocket = new Rocket (keys[1][0], keys[1][1],  0, 200, 200, 1);
   rockets.add(newRocket);
   
-  newRocket = new Rocket (keys[2][0], keys[2][1],  0, 200, 0);
+  newRocket = new Rocket (keys[2][0], keys[2][1],  0, 200, 0, 2);
   rockets.add(newRocket);
   
-  newRocket = new Rocket (keys[3][0], keys[3][1],  200, 200, 0);
+  newRocket = new Rocket (keys[3][0], keys[3][1],  200, 200, 0, 3);
   rockets.add(newRocket);
   
-  newRocket = new Rocket (keys[4][0], keys[4][1],  200, 0, 0);
+  newRocket = new Rocket (keys[4][0], keys[4][1],  200, 0, 0, 4);
   rockets.add(newRocket);
   
   //Rocket testRocket = rockets.get(0);
@@ -76,6 +76,7 @@ class Rocket {
   float xOffset, yOffset;
   float r,g,b;
   float testPosX, testPosY;
+  int rocketNum;
   
   boolean isMoving;
   float slope, angle;
@@ -84,13 +85,14 @@ class Rocket {
   float tmod;
   int t0time;
   
-  Rocket (float xOffset, float yOffset, float r, float g, float b) {
+  Rocket (float xOffset, float yOffset, float r, float g, float b, int rocketNum) {
     this.xOffset = xOffset;
     this.yOffset = yOffset;
     
     this.r = r;
     this.b = b;
     this.g = g;
+    this.rocketNum = rocketNum;
     
     testPosX = xOffset;
     testPosY = yOffset;
@@ -104,7 +106,6 @@ class Rocket {
   void drawRocket() {
     //testPosX = 0;
     //testPosY = 1;
-    //float slope, angle;
 
     pushMatrix();  //firework 1
     fill(r, g, b);
@@ -118,6 +119,11 @@ class Rocket {
         angle += PI;  //want in quadrant 2, not quadrant 4
       }
     } 
+    
+    if (currDragging && rocketNum == selectedRocket) {
+      xOffset = 2.0 * mouseX / width - 1;
+      yOffset = 2.0 * (height-mouseY+1) / height - 1;
+    }
     
     x = lerp(xOffset, testPosX, tmod);
     y = lerp(yOffset, testPosY, tmod);
@@ -157,7 +163,7 @@ class Rocket {
   }
 }
 
-Rocket selectedRocket;
+int selectedRocket;
 boolean rocketSelected = false;
 float dragTime = 0;
 boolean currDragging = false;
@@ -165,30 +171,29 @@ boolean currDragging = false;
 void mousePressed() {
   float mousePosX = 2.0 * mouseX / width - 1;
   float mousePosY = 2.0 * (height-mouseY+1) / height - 1;
-  int chosenRocket = -1;
   
   for (int i = rockets.size() - 1; i >= 0; i--) {
-    Rocket currRocket = rockets.get(i);
-    float totalDistance = dist(mousePosX, mousePosY, currRocket.xOffset, currRocket.yOffset);
+    Rocket checkRocket = rockets.get(i);
+    float totalDistance = dist(mousePosX, mousePosY, checkRocket.xOffset, checkRocket.yOffset);
     if (totalDistance <= 0.1) {
-      chosenRocket = i;
+      selectedRocket = i;
       break;
     }
   }
   
-  if (chosenRocket >= 0) {
+  if (selectedRocket >= 0) {
     rocketSelected = true;
-    selectedRocket = rockets.get(chosenRocket);
+    dragTime = millis();
   }
   
   println("X: " + mousePosX + ", Y = " + mousePosY);
-  println("Chosen rocket: " +chosenRocket);
+  println("Chosen rocket: " + selectedRocket);
 }
 
 void mouseDragged() {
   if (rocketSelected) {
     currDragging = true;
-    dragTime = millis();
+    redraw();
   }
 }
 
@@ -202,6 +207,11 @@ void mouseReleased() {
     
     println("XR: " + mousePosX + ", YR = " + mousePosY);
     println("Drag Time: " + dragTime);
+    
+    //TODO: CORRECT METHOD
+    //rockets.get(selectedRocket).setMovement(2*mousePosX, 2*mousePosY);
+    
     rocketSelected = false;   //rocket will blow up, no longer want it selected
+    selectedRocket = -1;    
   }
 }
