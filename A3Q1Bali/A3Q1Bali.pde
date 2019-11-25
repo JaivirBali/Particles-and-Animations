@@ -64,6 +64,8 @@ class Rocket {
   float tmod;
   int t0time;
   
+  ParticleSystem ps;
+  
   Rocket (float xOffset, float yOffset, float r, float g, float b, int rocketNum) {
     this.xOffset = xOffset;
     this.yOffset = yOffset;
@@ -129,9 +131,22 @@ class Rocket {
       if (t >= 1) {
         t = 1;
         isMoving = false;
+        
+        println("T >=1");
+        ps = new ParticleSystem(testPosX, testPosY);
+     
         resetRocket();
       } else {
         t = (millis() - t0time + 1000) / 2000.0 / 4 ;  //only want proportional to time, starting at 1/2 completed
+      }
+    }
+    
+    if (ps != null) {
+      if (ps.doneAnimating == false) {
+        ps.addParticle();
+        ps.run();
+      } else {
+        ps = null;
       }
     }
     
@@ -143,6 +158,7 @@ class Rocket {
     t = 0;
     testPosX = xOffset;
     testPosY = yOffset;
+    //ps = null;
   }
   
   void setMovement(float newX, float newY, float dragTime) {
@@ -157,7 +173,7 @@ class Rocket {
     float velocityX = (dx/dragTime)*1000.0;
     float velocityY = (dy/dragTime)*1000.0;
     
-    println("X velocity: " + velocityX + ", Y velocity: " + velocityY); 
+    //println("X velocity: " + velocityX + ", Y velocity: " + velocityY); 
     testPosX = newX + (1.0*velocityX);
     testPosY = newY + (1.0*velocityY);
   }
@@ -186,7 +202,7 @@ void mousePressed() {
     dragTime = millis();
   }
   
-  println("X: " + mousePosX + ", Y = " + mousePosY);
+  //println("X: " + mousePosX + ", Y = " + mousePosY);
   println("Chosen rocket: " + selectedRocket);
 }
 
@@ -205,12 +221,101 @@ void mouseReleased() {
     
     dragTime = millis() - dragTime;
     
-    println("XR: " + mousePosX + ", YR = " + mousePosY);
+    //println("XR: " + mousePosX + ", YR = " + mousePosY);
     println("Drag Time: " + dragTime);
     
     rockets.get(selectedRocket).setMovement(mousePosX, mousePosY, dragTime);
     
     rocketSelected = false;   //rocket will blow up, no longer want it selected
     selectedRocket = -1;    
+  }
+}
+
+
+class ParticleSystem {
+  ArrayList<Spark> sparks;
+  float originX;
+  float originY;
+  float startTime;
+  boolean doneAnimating = false;
+  float particleTime = 2000.0;
+  float totalTime = 4000.0;
+
+  ParticleSystem(float originX, float originY) {
+    this.originX = originX;
+    this.originY = originY;
+    sparks = new ArrayList<Spark>();
+    startTime = millis();
+  }
+
+  void addParticle() {
+    if (millis() - startTime < particleTime) {
+      sparks.add(new Spark(originX, originY));
+    }
+  }
+
+  void run() {
+    if (millis() - startTime < totalTime) {
+      for (int i = sparks.size()-1; i >= 0; i--) {
+        Spark p = sparks.get(i);
+        p.run();
+        if (p.isDead()) {
+          sparks.remove(i);
+        }
+      }
+    } else {
+      doneAnimating = true;
+    }
+  }
+}
+
+class Spark {
+  float positionX;
+  float positionY;
+  float velocityX;
+  float velocityY;
+  float gravity;
+  float lifespan;
+
+  Spark(float originX, float originY) {
+    positionX = originX;
+    positionY = originY;
+    gravity = -0.0009;
+    velocityX = random(-0.0075, 0.0075);
+    velocityY = random(0, 0.02);
+    lifespan = 255.0;
+  }
+
+  void run() {
+    update();
+    display();
+  }
+
+  // Method to update position
+  void update() {
+    velocityY += gravity;
+    positionX += velocityX;
+    positionY += velocityY;
+    lifespan -= 2.5;
+  }
+
+  // Method to display
+  void display() {
+    float r = random(0,256);
+    float g = random(0,256);
+    float b = random(0,256);
+    
+    stroke(0, lifespan);
+    fill(r, g, b, lifespan);
+    rect(positionX, positionY, 0.0125, 0.025);
+  }
+
+  // Is the particle still useful?
+  boolean isDead() {
+    if (lifespan < 0.0) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
